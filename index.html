@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #080808;
+      --deep: #0d0d0d;
+      --steel: #c2c8cc;
+      --offwhite: #f0ece6;
+      --accent: #a09888;
+      --red: #8c2020;
+      --gap: clamp(60px, 10vw, 120px);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--offwhite);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor { position: fixed; width: 8px; height: 8px; background: var(--offwhite); border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.15s ease; mix-blend-mode: difference; }
+    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(240,236,230,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transition: transform 0.35s ease, width 0.2s ease, height 0.2s ease; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 24px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    nav::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.9) 0%, transparent 100%);
+      z-index: -1;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--offwhite); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--steel); text-decoration: none; transition: color 0.25s;
+    }
+    .nav-links a:hover { color: var(--offwhite); }
+
+    /* HERO */
+    .hero {
+      position: relative; height: 100vh; min-height: 700px;
+      display: flex; align-items: flex-end; overflow: hidden;
+    }
+    .hero-img {
+      position: absolute; inset: 0;
+      background-image: url('hero.jpg');
+      background-size: cover; background-position: center 20%;
+      transform: scale(1.04);
+      animation: heroZoom 8s ease-out forwards;
+    }
+    @keyframes heroZoom { from { transform: scale(1.04); } to { transform: scale(1); } }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, rgba(8,8,8,0) 30%, rgba(8,8,8,0.5) 70%, rgba(8,8,8,0.95) 100%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 48px 64px; width: 100%;
+      animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--steel); margin-bottom: 20px;
+    }
+    .hero-wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(80px, 16vw, 200px);
+      font-weight: 300; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--offwhite);
+      line-height: 0.85;
+    }
+    .hero-socials {
+      position: absolute; right: 48px; bottom: 64px;
+      display: flex; flex-direction: column; gap: 16px; align-items: center;
+      z-index: 3;
+    }
+    .hero-socials a {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(240,236,230,0.2);
+      color: var(--steel); text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .hero-socials a:hover { border-color: var(--offwhite); color: var(--offwhite); background: rgba(240,236,230,0.06); }
+    .hero-socials a svg { width: 16px; height: 16px; fill: currentColor; }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.25em; color: var(--steel); text-transform: uppercase;
+      opacity: 0; animation: fadeIn 1s ease 1.5s forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .hero-scroll-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--steel), transparent);
+      animation: scrollPulse 2s ease-in-out 1.5s infinite;
+    }
+    @keyframes scrollPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    section { padding: var(--gap) 48px; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--red);
+      margin-bottom: 48px; display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(194,200,204,0.15); }
+
+    /* ABOUT */
+    #about {
+      background: var(--deep);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .about-image-wrap { position: relative; height: 640px; overflow: hidden; }
+    .about-image-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      object-position: center 55%;
+      display: block; transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .about-image-wrap:hover img { transform: scale(1.04); }
+    .about-image-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(13,13,13,0.8) 100%);
+    }
+    .about-text { padding: 20px 0; }
+    .about-quote {
+      font-size: clamp(20px, 2.5vw, 28px); font-style: italic;
+      line-height: 1.5; color: var(--offwhite); margin-bottom: 36px;
+      border-left: 2px solid var(--red); padding-left: 28px;
+    }
+    .about-bio { font-size: 17px; line-height: 1.9; color: var(--accent); }
+    .about-bio p + p { margin-top: 20px; }
+    .about-testament {
+      margin-top: 32px; padding: 24px 28px;
+      border: 1px solid rgba(194,200,204,0.1);
+      font-size: 15px; font-style: italic; line-height: 1.75; color: var(--steel);
+    }
+    .about-testament cite {
+      display: block; margin-top: 12px;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--red);
+      font-style: normal;
+    }
+
+    /* DISCOGRAPHY */
+    #discography { background: var(--black); }
+    .disco-header {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end;
+      margin-bottom: 64px;
+    }
+    .disco-header h2 {
+      font-size: clamp(36px, 5vw, 64px); font-style: italic;
+      line-height: 1.1; color: var(--offwhite);
+    }
+    .disco-meta p { font-size: 16px; line-height: 1.85; color: var(--accent); margin-bottom: 20px; }
+    .disco-inspirations {
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--steel); opacity: 0.7;
+    }
+    .singles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .single-card { position: relative; aspect-ratio: 2/3; overflow: hidden; background: #111; cursor: pointer; }
+    .single-card-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); filter: grayscale(20%);
+    }
+    .single-card:nth-child(1) .single-card-img { object-position: center top; }
+    .single-card:nth-child(2) .single-card-img { object-position: center 20%; }
+    .single-card:nth-child(3) .single-card-img { object-position: center 40%; }
+    .single-card:hover .single-card-img { transform: scale(1.06); filter: grayscale(0%); }
+    .single-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 20%, rgba(8,8,8,0.97) 100%);
+    }
+    .single-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px; }
+    .single-status {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--red); margin-bottom: 8px;
+    }
+    .single-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+      letter-spacing: 0.05em; color: var(--offwhite); margin-bottom: 8px;
+    }
+    .single-desc {
+      font-size: 12px; line-height: 1.6; color: var(--accent);
+      margin-bottom: 14px; opacity: 0; transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+    .single-card:hover .single-desc { opacity: 1; transform: translateY(0); }
+    .single-links a {
+      font-family: 'DM Mono', monospace; font-size: 8px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--offwhite); text-decoration: none;
+      border-bottom: 1px solid rgba(240,236,230,0.3); padding-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+    .single-links a:hover { border-color: var(--offwhite); }
+
+    /* LIVE */
+    #live { background: var(--deep); }
+    .live-top {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+      margin-bottom: 60px;
+    }
+    .live-heading {
+      font-size: clamp(48px, 7vw, 80px); font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.06em; color: var(--offwhite); line-height: 1; margin-bottom: 24px;
+    }
+    .live-bio { font-size: 16px; line-height: 1.85; color: var(--accent); margin-bottom: 32px; }
+    .dates-list { list-style: none; }
+    .date-item {
+      display: grid; grid-template-columns: 90px 1fr auto;
+      gap: 20px; align-items: center;
+      padding: 20px 0; border-bottom: 1px solid rgba(194,200,204,0.1);
+    }
+    .date-item:first-child { border-top: 1px solid rgba(194,200,204,0.1); }
+    .date-month {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--red);
+    }
+    .date-event { font-size: 15px; color: var(--offwhite); }
+    .date-venue {
+      display: block; font-size: 11px; color: var(--steel);
+      margin-top: 3px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em;
+    }
+    .date-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .date-badge {
+      font-family: 'DM Mono', monospace; font-size: 8px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      border: 1px solid rgba(194,200,204,0.2); padding: 4px 8px; color: var(--steel);
+    }
+    .date-badge.past { opacity: 0.45; }
+    .date-badge.upcoming { border-color: var(--red); color: var(--red); opacity: 1; }
+    .date-badge.soldout { border-color: rgba(240,236,230,0.5); color: var(--offwhite); background: rgba(240,236,230,0.06); }
+    .booking-note {
+      margin-top: 28px; font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.2em; color: var(--steel); text-transform: uppercase;
+    }
+    .booking-note a { color: var(--offwhite); text-decoration: none; border-bottom: 1px solid rgba(240,236,230,0.2); padding-bottom: 2px; }
+    .booking-note a:hover { border-color: var(--offwhite); }
+
+    /* Live strip */
+    .live-strip-wrap { position: relative; overflow: hidden; margin-top: 56px; }
+    .live-strip-wrap::before,
+    .live-strip-wrap::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 2; pointer-events: none;
+    }
+    .live-strip-wrap::before { left: 0; background: linear-gradient(to right, var(--deep), transparent); }
+    .live-strip-wrap::after { right: 0; background: linear-gradient(to left, var(--deep), transparent); }
+    .live-strip {
+      display: flex; gap: 6px;
+      animation: stripScroll 45s linear infinite;
+      width: max-content;
+    }
+    .live-strip:hover { animation-play-state: paused; }
+    @keyframes stripScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .live-strip-item {
+      width: 200px; height: 260px; flex-shrink: 0; overflow: hidden; position: relative;
+      background: #111;
+    }
+    .live-strip-item img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center top;
+      display: block; transition: transform 0.5s ease;
+    }
+    .live-strip-item:hover img { transform: scale(1.05); }
+    .live-strip-item video {
+      width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer;
+    }
+    .strip-play-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,8,8,0.35); transition: background 0.2s; pointer-events: none;
+    }
+    .live-strip-item:hover .strip-play-overlay { background: rgba(8,8,8,0.15); }
+    .strip-play-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(240,236,230,0.6);
+      display: flex; align-items: center; justify-content: center; color: var(--offwhite);
+    }
+    .strip-play-icon svg { width: 14px; height: 14px; fill: currentColor; margin-left: 2px; }
+    .live-strip-item.playing .strip-play-overlay { display: none; }
+
+    /* Photo credit */
+    .photo-credit {
+      margin-top: 16px; text-align: right;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.15em; text-transform: uppercase; color: rgba(194,200,204,0.35);
+    }
+    .photo-credit a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(194,200,204,0.2); padding-bottom: 1px; transition: color 0.2s; }
+    .photo-credit a:hover { color: var(--steel); }
+
+    /* MERCH */
+    #merch { background: var(--black); text-align: center; }
+    .merch-inner { max-width: 560px; margin: 0 auto; }
+    .merch-heading {
+      font-size: clamp(56px, 10vw, 120px);
+      font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em;
+      line-height: 0.9; color: var(--offwhite); margin-bottom: 24px;
+    }
+    .merch-sub { font-size: 18px; font-style: italic; color: var(--accent); line-height: 1.6; margin-bottom: 12px; }
+    .merch-note { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--steel); margin-bottom: 40px; }
+    .merch-cta {
+      display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--black); background: var(--offwhite);
+      padding: 16px 40px; text-decoration: none; transition: background 0.2s;
+    }
+    .merch-cta:hover { background: var(--steel); }
+    .merch-divider { width: 1px; height: 100px; background: linear-gradient(to bottom, transparent, rgba(194,200,204,0.25), transparent); margin: 60px auto; }
+
+    /* CONTACT */
+    #contact { background: var(--deep); border-top: 1px solid rgba(194,200,204,0.08); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 60px; align-items: start; }
+    .contact-image-wrap { height: 420px; overflow: hidden; }
+    .contact-image-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transition: transform 0.8s ease; }
+    .contact-image-wrap:hover img { transform: scale(1.04); }
+    .contact-invite { font-size: clamp(28px, 4vw, 48px); font-style: italic; color: var(--offwhite); line-height: 1.2; margin-bottom: 40px; }
+    .contact-items { display: flex; flex-direction: column; gap: 24px; }
+    .contact-item { display: flex; flex-direction: column; gap: 6px; }
+    .contact-role { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); }
+    .contact-email { font-size: 15px; color: var(--offwhite); text-decoration: none; border-bottom: 1px solid rgba(240,236,230,0.15); padding-bottom: 3px; display: inline-block; transition: border-color 0.2s; }
+    .contact-email:hover { border-color: var(--offwhite); }
+    .contact-right { display: flex; flex-direction: column; gap: 40px; }
+    .contact-actions { display: flex; flex-direction: column; gap: 12px; }
+    .contact-action-btn {
+      display: flex; align-items: center; gap: 14px;
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--steel); text-decoration: none;
+      border: 1px solid rgba(194,200,204,0.15); padding: 16px 20px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .contact-action-btn:hover { border-color: rgba(240,236,230,0.4); color: var(--offwhite); }
+    .contact-action-btn svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+    .contact-socials { display: flex; flex-direction: column; gap: 12px; }
+    .contact-socials a {
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--steel); text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 12px;
+    }
+    .contact-socials a::before { content: ''; width: 24px; height: 1px; background: var(--steel); transition: width 0.2s, background 0.2s; }
+    .contact-socials a:hover { color: var(--offwhite); }
+    .contact-socials a:hover::before { width: 40px; background: var(--offwhite); }
+
+    footer { background: var(--black); padding: 28px 48px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(194,200,204,0.08); }
+    .footer-copy { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(194,200,204,0.3); }
+    .footer-wordmark { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; letter-spacing: 0.45em; text-transform: uppercase; color: rgba(240,236,230,0.12); }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      .nav-links { gap: 20px; }
+      section { padding: var(--gap) 24px; }
+      #about, .contact-grid, .live-top, .disco-header { grid-template-columns: 1fr; gap: 40px; }
+      .about-image-wrap { height: 460px; }
+      .singles-grid { grid-template-columns: 1fr; }
+      .single-card { aspect-ratio: 4/3; }
+      .single-desc { opacity: 1; transform: none; }
+      .hero-content { padding: 0 24px 120px; }
+      .hero-socials { right: 24px; bottom: 24px; flex-direction: row; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <nav>
+    <a href="#" class="nav-logo">Lara</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#discography">Music</a></li>
+      <li><a href="#live">Live</a></li>
+      <li><a href="#merch">Merch</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" id="home">
+    <div class="hero-img"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Stockholm</p>
+      <div class="hero-wordmark">LARA</div>
+    </div>
+    <div class="hero-socials">
+      <a href="https://open.spotify.com/artist/0BudKMCTqOhcrPkhL0JkXZ" target="_blank" title="Spotify"><svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+      <a href="https://www.instagram.com/lararelated/" target="_blank" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+      <a href="https://www.tiktok.com/@lararelated" target="_blank" title="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+      <a href="https://www.youtube.com/channel/UCexS3MIRNcYe2JZeeRTXmwQ" target="_blank" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+    </div>
+    <div class="hero-scroll"><span>Scroll</span><div class="hero-scroll-line"></div></div>
+  </section>
+
+  <div style="text-align:right; padding: 8px 48px; background: var(--black);"><span style="font-family:'DM Mono',monospace; font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(194,200,204,0.25);">Photos &mdash; <a href="https://www.instagram.com/paar.productions/" target="_blank" style="color:inherit; text-decoration:none; border-bottom:1px solid rgba(194,200,204,0.15);">Paar Productions</a></span></div>
+
+  <section id="about">
+    <div class="about-image-wrap reveal">
+      <img src="about.jpg" alt="LARA" />
+      <div class="about-image-overlay"></div>
+    </div>
+    <div class="about-text reveal">
+      <div class="section-label">About</div>
+      <blockquote class="about-quote">"Music is how I survive, how I stay alive, and how I honor both who I am today and the child I once was."</blockquote>
+      <div class="about-bio">
+        <p>LARA is a Stockholm-based artist and topliner recognized for her powerful vocals, sharp melodic instincts, and fearless creative vision. Having honed her craft through songwriting camps and studio sessions across the UK, Los Angeles, Sweden, and Korea, she has quickly established herself as a versatile and in-demand creative force.</p>
+        <p>Driven, self-aware, and fierce, LARA knows exactly who she is and what she stands for. She speaks directly to the young women of her generation, offering a space where vulnerability is strength and being weird is something to celebrate. She is building a singular sonic world that only she can carry.</p>
+      </div>
+      <div class="about-testament">
+        "This project is my entire life translated into music — my feelings, thoughts, traumas, secrets, and growth. Like a quick dive into my personal diary. Through every song, I'm reclaiming space as someone who's always felt different, broken, or too much. I want my music to feel like a missing piece for people like me — like they can finally breathe and let their heart beat at the tempo it was meant to."
+        <cite>&mdash; LARA</cite>
+      </div>
+    </div>
+  </section>
+
+  <section id="discography">
+    <div class="section-label">Music</div>
+    <div class="disco-header reveal">
+      <h2>Where bold production<br/>meets raw emotion.</h2>
+      <div class="disco-meta">
+        <p>LARA's sound lives at the intersection of pop, hip-hop, R&amp;B, and soul — fusing forward-thinking production with emotionally honest lyricism. Unapologetically experimental, refusing to be boxed in, continuously pushing what a song can feel like.</p>
+        <div class="disco-inspirations">Inspirations &mdash; Kanye West &nbsp;&middot;&nbsp; Labrinth &nbsp;&middot;&nbsp; Raye &nbsp;&middot;&nbsp; Lady Gaga &nbsp;&middot;&nbsp; Beyonc&eacute;</div>
+      </div>
+    </div>
+    <div class="singles-grid">
+      <div class="single-card reveal">
+        <img src="ohy.jpg" class="single-card-img" alt="Oh Yeh" />
+        <div class="single-overlay"></div>
+        <div class="single-info">
+          <p class="single-status">Out Now &mdash; March 13, 2026</p>
+          <h3 class="single-title">Oh Yeh</h3>
+          <p class="single-desc">Loving someone you can't save. The emotional tension between hope and loss.</p>
+          <div class="single-links"><a href="https://open.spotify.com/track/6Lxa6MXt1jf8exZ9XH9Imi?si=dbe788c517f04cf3" target="_blank">Listen on Spotify</a></div>
+        </div>
+      </div>
+      <div class="single-card reveal" style="transition-delay:0.1s">
+        <img src="seeuin3d.jpg" class="single-card-img" alt="See U in 3D" />
+        <div class="single-overlay"></div>
+        <div class="single-info">
+          <p class="single-status">May 1, 2026</p>
+          <h3 class="single-title">See U in 3D</h3>
+          <p class="single-desc">A deeply vulnerable song about childhood trauma, abandonment, and the emotions that follow.</p>
+          <div class="single-links"><a href="https://presave.rls.ee/dde49edc-2e8f-4637-8d3a-52cb377ab88a" target="_blank">Pre-Save</a></div>
+        </div>
+      </div>
+      <div class="single-card reveal" style="transition-delay:0.2s">
+        <img src="ibeokay_new.jpg" class="single-card-img" alt="I Be Okay" />
+        <div class="single-overlay"></div>
+        <div class="single-info">
+          <p class="single-status">Stay Tuned</p>
+          <h3 class="single-title">I Be Okay</h3>
+          <p class="single-desc">A statement of confidence and independence. Choosing yourself, owning your worth.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="live">
+    <div class="section-label">Live</div>
+    <div class="live-top">
+      <div class="reveal">
+        <h2 class="live-heading">On Stage</h2>
+        <p class="live-bio">LARA is a driving force on stage. She started performing at a very young age, singing covers in bars and intimate venues — quickly building a reputation for a voice that stops a room. A multiple award winner during her school years, she's always known the stage was where she belonged. Today, her live sets translate the raw intimacy of her music into something visceral and unforgettable — every show a chance to make someone in the audience feel a little less alone.</p>
+      </div>
+      <div class="reveal">
+        <ul class="dates-list">
+          <li class="date-item">
+            <span class="date-month">Mar 13<br/>2026</span>
+            <span class="date-event">Pet Sounds Bar<span class="date-venue">Stockholm, Sweden</span></span>
+            <div class="date-badges"><span class="date-badge past">Past</span><span class="date-badge soldout">Sold Out</span></div>
+          </li>
+          <li class="date-item">
+            <span class="date-month">Apr 3<br/>2026</span>
+            <span class="date-event">S&ouml;dra Teatern<span class="date-venue">Stockholm, Sweden</span></span>
+            <div class="date-badges"><span class="date-badge past">Past</span><span class="date-badge soldout">Sold Out</span></div>
+          </li>
+          <li class="date-item">
+            <span class="date-month">Apr 25<br/>2026</span>
+            <span class="date-event">Festival<span class="date-venue">TBA</span></span>
+            <div class="date-badges"><span class="date-badge upcoming">Upcoming</span></div>
+          </li>
+        </ul>
+        <p class="booking-note">Booking &rarr; <a href="mailto:officialmusiclara@gmail.com">officialmusiclara@gmail.com</a></p>
+      </div>
+    </div>
+    <div class="live-strip-wrap reveal">
+      <div class="live-strip">
+        <!-- Set A -->
+        <div class="live-strip-item"><img src="live_new3.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live1.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live_new4.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live_new2.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live_new5.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live_new1.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live2.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live4.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live3.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <!-- Set B (duplicate for seamless loop) -->
+        <div class="live-strip-item"><img src="live_new3.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live1.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live_new4.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live_new2.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live_new5.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live_new1.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live2.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+        <div class="live-strip-item"><img src="live4.jpg" alt="LARA live" /></div>
+        <div class="live-strip-item"><img src="live3.jpg" alt="LARA live" style="filter:grayscale(100%)" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="merch">
+    <div class="section-label">Merch</div>
+    <div class="merch-inner reveal">
+      <h2 class="merch-heading">Wear<br/>It Later</h2>
+      <p class="merch-sub">Good things take time. The collection isn't out yet.</p>
+      <p class="merch-note">Drop coming. Eventually. Probably.</p>
+      <div class="merch-divider"></div>
+      <a href="mailto:officialmusiclara@gmail.com?subject=Merch%20Waitlist" class="merch-cta">Notify Me</a>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="contact-image-wrap reveal">
+        <img src="contact_img.jpg" alt="LARA" />
+      </div>
+      <div class="reveal">
+        <div class="contact-invite">Get in touch.</div>
+        <div class="contact-items">
+          <div class="contact-item">
+            <span class="contact-role">Management</span>
+            <a href="mailto:pro.eliots@gmail.com" class="contact-email">pro.eliots@gmail.com</a>
+            <a href="mailto:niosha@ctgamusic.com" class="contact-email">niosha@ctgamusic.com</a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-right reveal">
+        <div>
+          <div class="section-label">Stay Connected</div>
+          <div class="contact-actions">
+            <a href="#" class="contact-action-btn"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Sign up for the Newsletter</a>
+            <a href="https://presave.rls.ee/dde49edc-2e8f-4637-8d3a-52cb377ab88a" target="_blank" class="contact-action-btn"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Pre-Save &mdash; See U in 3D</a>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Follow</div>
+          <div class="contact-socials">
+            <a href="https://open.spotify.com/artist/0BudKMCTqOhcrPkhL0JkXZ" target="_blank">Spotify</a>
+            <a href="https://www.instagram.com/lararelated/" target="_blank">Instagram</a>
+            <a href="https://www.tiktok.com/@lararelated" target="_blank">TikTok</a>
+            <a href="https://www.youtube.com/channel/UCexS3MIRNcYe2JZeeRTXmwQ" target="_blank">YouTube</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-copy">&copy; 2026 LARA. All rights reserved.</span>
+    <span class="footer-wordmark">Lara</span>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx - 18 + 'px'; ring.style.top = ry - 18 + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2.5)'; ring.style.width = '56px'; ring.style.height = '56px'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '36px'; ring.style.height = '36px'; });
+    });
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.cl
