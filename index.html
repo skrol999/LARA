@@ -364,8 +364,9 @@
     .footer-copy { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(194,200,204,0.3); }
     .footer-wordmark { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; letter-spacing: 0.45em; text-transform: uppercase; color: rgba(240,236,230,0.12); }
 
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal { opacity: 1; transform: translateY(0); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .js-loaded .reveal { opacity: 0; transform: translateY(30px); }
+    .js-loaded .reveal.visible { opacity: 1; transform: translateY(0); }
 
     @media (max-width: 900px) {
       nav { padding: 18px 24px; }
@@ -587,6 +588,8 @@
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0;
+    // Add js-loaded so reveal animation kicks in
+    document.body.classList.add('js-loaded');
     document.addEventListener('mousemove', e => {
       mx = e.clientX; my = e.clientY;
       cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px';
