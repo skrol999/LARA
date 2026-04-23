@@ -502,6 +502,11 @@
             <span class="date-event">Echoes Festival<span class="date-venue">Stockholm, Sweden</span></span>
             <div class="date-badges"><span class="date-badge upcoming">Upcoming</span></div>
           </li>
+          <li class="date-item">
+            <span class="date-month">May 25<br/>2026</span>
+            <span class="date-event">Spy Bar<span class="date-venue">Peter Englund Fashion Show</span></span>
+            <div class="date-badges"><span class="date-badge upcoming">Upcoming</span></div>
+          </li>
         </ul>
         <p class="booking-note">Booking &rarr; <a href="mailto:officialmusiclara@gmail.com">officialmusiclara@gmail.com</a></p>
       </div>
@@ -588,13 +593,12 @@
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0;
-    // Add js-loaded so reveal animation kicks in
     document.body.classList.add('js-loaded');
     document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px';
-  cursor.style.opacity = 1; ring.style.opacity = 1;
-});
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px';
+      cursor.style.opacity = 1; ring.style.opacity = 1;
+    });
     (function animRing() {
       rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
       ring.style.left = rx - 18 + 'px'; ring.style.top = ry - 18 + 'px';
@@ -606,4 +610,9 @@
     });
     const reveals = document.querySelectorAll('.reveal');
     const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.cl
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>
